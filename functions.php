@@ -33,3 +33,35 @@ add_action('wp_enqueue_scripts', function () {
         'nonce'   => wp_create_nonce('wp_rest'),
     ]);
 });
+add_action('init', function () {
+    register_post_type('testimonial', [
+        'label'        => 'Testimonials',
+        'public'       => true,
+        'menu_icon'    => 'dashicons-format-quote',
+        'supports'     => ['title', 'editor', 'thumbnail'],
+        'show_in_rest' => true,
+    ]);
+});
+
+add_action('add_meta_boxes', function () {
+    add_meta_box('testimonial_meta', 'Client Info', function ($post) {
+        $role = get_post_meta($post->ID, '_role', true);
+        wp_nonce_field('save_testimonial_meta', 'testimonial_meta_nonce');
+        echo '<input type="text" name="role" value="' . esc_attr($role) . '" style="width:100%;" />';
+    }, 'testimonial');
+});
+
+add_action('save_post_testimonial', function ($post_id) {
+    if (!isset($_POST['testimonial_meta_nonce']) || !wp_verify_nonce($_POST['testimonial_meta_nonce'], 'save_testimonial_meta')) return;
+    update_post_meta($post_id, '_role', sanitize_text_field($_POST['role'] ?? ''));
+});
+
+add_action('after_setup_theme', function () {
+    register_nav_menus([
+        'primary' => 'Primary Menu',
+    ]);
+
+    add_theme_support('title-tag');
+    add_theme_support('post-thumbnails');
+    add_theme_support('custom-logo');
+});
