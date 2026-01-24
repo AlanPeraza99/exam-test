@@ -1,4 +1,4 @@
-<section class="py-16 bg-white">
+<section class="py-16 bg-white" id="products">
     <div class="max-w-6xl mx-auto px-6">
         <div class="flex items-end justify-between gap-4 mb-8">
             <div>

@@ -1,11 +1,6 @@
 <?php
 
-/* ======================================================
- * Enqueue scripts & styles
- * ====================================================== */
 add_action('wp_enqueue_scripts', function () {
-
-    // Tailwind CDN
     wp_enqueue_script(
         'tailwind',
         'https://cdn.tailwindcss.com',
@@ -13,8 +8,6 @@ add_action('wp_enqueue_scripts', function () {
         null,
         false
     );
-
-    // Tailwind config
     wp_add_inline_script('tailwind', "
       tailwind.config = {
         theme: {
@@ -22,14 +15,14 @@ add_action('wp_enqueue_scripts', function () {
             colors: {
               primary: '#65B2E8',
               secondary: '#002D74',
-              tertiary: '#98989A'
+              tertiary: '#98989A',
+              whiteFont: '#ffff',
             }
           }
         }
       }
     ");
 
-    // React app (WordPress React)
     wp_enqueue_script(
         'theme-react-app',
         get_template_directory_uri() . '/assets/react/app.js',
@@ -45,9 +38,6 @@ add_action('wp_enqueue_scripts', function () {
     ]);
 });
 
-/* ======================================================
- * Theme setup
- * ====================================================== */
 add_action('after_setup_theme', function () {
     register_nav_menus([
         'primary' => 'Primary Menu',
@@ -58,9 +48,6 @@ add_action('after_setup_theme', function () {
     add_theme_support('custom-logo');
 });
 
-/* ======================================================
- * CPT: Testimonials
- * ====================================================== */
 add_action('init', function () {
     register_post_type('testimonial', [
         'label'        => 'Testimonials',
@@ -71,9 +58,6 @@ add_action('init', function () {
     ]);
 });
 
-/* ======================================================
- * CPT: Products
- * ====================================================== */
 add_action('init', function () {
     register_post_type('product', [
         'label'        => 'Products',
@@ -94,9 +78,6 @@ add_action('init', function () {
     ]);
 });
 
-/* ======================================================
- * CPT: Inquiries (Admin only)
- * ====================================================== */
 add_action('init', function () {
     register_post_type('inquiry', [
         'labels' => [
@@ -110,9 +91,6 @@ add_action('init', function () {
     ]);
 });
 
-/* ======================================================
- * Metaboxes
- * ====================================================== */
 add_action('add_meta_boxes', function () {
 
     // Testimonials meta
@@ -130,9 +108,6 @@ add_action('add_meta_boxes', function () {
     }, 'product');
 });
 
-/* ======================================================
- * Save Metaboxes
- * ====================================================== */
 add_action('save_post_testimonial', function ($post_id) {
     if (!isset($_POST['testimonial_meta_nonce']) || !wp_verify_nonce($_POST['testimonial_meta_nonce'], 'save_testimonial_meta')) return;
     update_post_meta($post_id, '_role', sanitize_text_field($_POST['role'] ?? ''));
@@ -143,9 +118,6 @@ add_action('save_post_product', function ($post_id) {
     update_post_meta($post_id, 'price', sanitize_text_field($_POST['product_price'] ?? ''));
 });
 
-/* ======================================================
- * Customizer: Home Banner
- * ====================================================== */
 add_action('customize_register', function ($wp_customize) {
 
     $wp_customize->add_section('home_banner', [
@@ -158,16 +130,44 @@ add_action('customize_register', function ($wp_customize) {
         'sanitize_callback' => 'sanitize_text_field',
     ]);
 
+
     $wp_customize->add_control('home_banner_title', [
         'label' => 'Banner Title',
         'section' => 'home_banner',
         'type' => 'text',
     ]);
+
+    $wp_customize->add_setting('home_banner_subtitle', [
+        'default'           => 'Premium wellness products, crafted with care.',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+
+    $wp_customize->add_control('home_banner_subtitle', [
+        'label'   => 'Banner Subtitle',
+        'section' => 'home_banner',
+        'type'    => 'text',
+    ]);
+
+
+
+    $wp_customize->add_setting('home_banner_bg', [
+        'default'           => '',
+        'sanitize_callback' => 'absint',
+    ]);
+
+    $wp_customize->add_control(
+        new WP_Customize_Media_Control(
+            $wp_customize,
+            'home_banner_bg',
+            [
+                'label'    => 'Banner Background Image',
+                'section'  => 'home_banner',
+                'mime_type' => 'image',
+            ]
+        )
+    );
 });
 
-/* ======================================================
- * REST Endpoint: POST /velovita/v1/inquiries
- * ====================================================== */
 add_action('rest_api_init', function () {
     register_rest_route('velovita/v1', '/inquiries', [
         'methods' => WP_REST_Server::CREATABLE,
@@ -207,9 +207,7 @@ add_action('rest_api_init', function () {
     ]);
 });
 
-/* ======================================================
- * Admin Columns: Inquiries (BONUS)
- * ====================================================== */
+
 add_filter('manage_inquiry_posts_columns', function ($cols) {
     unset($cols['date']);
     $cols['inq_name'] = 'Name';
@@ -224,3 +222,11 @@ add_action('manage_inquiry_posts_custom_column', function ($col, $id) {
     if ($col === 'inq_email') echo esc_html(get_post_meta($id, 'email', true));
     if ($col === 'inq_topic') echo esc_html(get_post_meta($id, 'topic', true));
 }, 10, 2);
+
+add_filter('get_custom_logo', function ($html) {
+    return str_replace(
+        '<img',
+        '<img class="h-full w-auto max-w-full object-contain"',
+        $html
+    );
+});

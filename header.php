@@ -6,28 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?php wp_head(); ?>
 </head>
-<header class="border-b border-gray-200 bg-primary">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div class="text-font text-xl font-bold tracking-tight">
-            Velovita
+
+<body <?php body_class(); ?>>
+    <header class="sticky top-0 z-50 border-b border-gray-200 bg-primary h-16">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+
+            <div class="font-bold tracking-tight text-whiteFont">
+                <?php if (has_custom_logo()) : ?>
+                    <div class="h-2 max-w-[140px] flex items-center">
+                        <?php the_custom_logo(); ?>
+                    </div>
+                <?php else : ?>
+                    Logo
+                <?php endif; ?>
+            </div>
+
+            <nav>
+                <?php
+                wp_nav_menu([
+                    'theme_location' => 'primary',
+                    'container'      => false,
+                    'menu_class'     => 'hidden md:flex items-center gap-6 text-sm font-medium text-whiteFont',
+                    'fallback_cb'    => false,
+                ]);
+                ?>
+            </nav>
+
         </div>
-        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-font text-whiteFont">
-            <a href="#" class="hover:text-whiteFont">Home</a>
-            <a href="#" class="hover:text-whiteFont">Products</a>
-            <a href="#" class="hover:text-whiteFont">About</a>
-            <a href="#" class="hover:text-whiteFont">Contact</a>
-        </nav>
-        <a
-            href="#"
-            class="hidden md:inline-flex items-center justify-center px-4 py-2 rounded-lg bg-secondary text-whiteFont text-sm font-medium hover:bg-gray-800">
-            Contacto
-        </a>
-        <button class="md:hidden px-3 py-2 border rounded-lg text-sm">
-            Menu
-        </button>
-    </div>
-</header>
+    </header>
 
-<main>
-
-    <body <?php body_class(); ?>>
+    <main>

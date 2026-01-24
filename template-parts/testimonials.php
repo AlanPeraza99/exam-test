@@ -8,7 +8,7 @@ $q = new WP_Query([
 echo '<pre style="color:white">FOUND: ' . esc_html($q->found_posts) . '</pre>';
 ?>
 
-<section class="py-20 bg-secondary text-white">
+<section class="py-20 bg-secondary text-white" id="testimonials">
     <div class="max-w-6xl mx-auto px-6">
         <h2 class="text-3xl font-bold mb-12 text-center">
             What Our Customers Say
